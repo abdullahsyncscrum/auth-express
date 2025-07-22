@@ -1,8 +1,5 @@
 class Users {
-
-    static users = [];
-
-
+  static users = [];
 }
 
- module.exports = Users;
+module.exports = Users;

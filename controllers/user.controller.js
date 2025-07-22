@@ -89,7 +89,7 @@ const updatePassword = async (req, res) => {
 
   user.password = hashedPassword;
 
-  return res.status(200).json("Password is updated successfully!");
+  return res.status(200).json({ message: "Password is updated successfully!" });
 };
 
 const logOut = (req, res) => {
