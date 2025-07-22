@@ -1,0 +1,43 @@
+### Get all users
+GET http://localhost:3000/api/vi/user/me
+Content-Type: application/json
+
+### Create a new user
+POST http://localhost:3000/api/vi/user/register
+Content-Type: application/json
+
+{
+  "password": "@J1ohndoe",
+  "username": "@J1ohndoe",
+  "email": "john.doe@example.com"
+}
+
+
+
+### Sign in
+POST http://localhost:3000/api/vi/user/signin
+Content-Type: application/json
+
+{
+  "password": "@J1ohndoe",
+  "username": "@J1ohndoe",
+  "email": "john.doe@example.com"
+}
+
+
+### Reset password
+PATCH http://localhost:3000/api/vi/user/update-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTcxMTc2LCJleHAiOjE3NTMyNTc1NzZ9.6XqXGYqVysEw3ztEYOcMlEV4AOiPbchCbYuhQtyk_Ek
+
+{
+  "oldPassword": "@J1ohndoe",
+  "newPassword": "@J1ohndoe",
+  "email": "john.doe@example.com"
+}
+
+
+### Logout
+GET http://localhost:3000/api/vi/user/logout
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTcxMTc2LCJleHAiOjE3NTMyNTc1NzZ9.6XqXGYqVysEw3ztEYOcMlEV4AOiPbchCbYuhQtyk_Ek
