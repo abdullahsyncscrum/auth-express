@@ -4,6 +4,7 @@ const registerBodyValidation = require("../middlewares/register-validation.middl
 const signInBodyValidation = require("../middlewares/signin.middleware");
 const authentication = require("../middlewares/auth-middleware");
 const updatePasswordValidation = require("../middlewares/update-password-validation.middleware");
+const payloadErrorHandler = require("../middlewares/validate-body.middleware");
 
 const {
   registerUser,
@@ -13,15 +14,21 @@ const {
   getAllUsers,
 } = require("../controllers/user.controller");
 
-userRouter.get("/all", getAllUsers);
+userRouter.get("/all", authentication, getAllUsers);
 
-userRouter.post("/register", registerBodyValidation, registerUser);
+userRouter.post(
+  "/register",
+  registerBodyValidation,
+  payloadErrorHandler,
+  registerUser
+);
 
-userRouter.post("/signin", signInBodyValidation, signIn);
+userRouter.post("/signin", signInBodyValidation, payloadErrorHandler, signIn);
 
 userRouter.patch(
   "/update-password",
   updatePasswordValidation,
+  payloadErrorHandler,
   authentication,
   updatePassword
 );

@@ -1,25 +1,30 @@
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
-const authentication = (req, res, next) => {
-     const authHeader = req.headers.authorization;
-     let token = ''
-     if (authHeader && authHeader.startsWith('Bearer ')) {
- 
-  token = authHeader.split(' ')[1];
+const User = require("../model/user.model");
 
-}
-    if (!authHeader) {
-        return res.status(401).json({ error: "Unauthorized" });
+const authentication = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  let token = "";
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  }
+  if (!authHeader) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const user = await User.findOne({ jwtToken: token });
+
+  if (!user) {
+    return res.status(400).json({ error: "Incorrect Jwt token" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(401).json({ error: JSON.stringify(err) });
     }
+    req.user = decoded;
+    next();
+  });
+};
 
-    jwt.verify(token, process.env.JWT_SECRET || "secret", function (err, decoded) {
-        if (err) {
-            return res.status(401).json({ error: JSON.stringify(err) });
-        }
-        req.user = decoded
-        next()
-    })
-
-}
-
-module.exports = authentication
+module.exports = authentication;

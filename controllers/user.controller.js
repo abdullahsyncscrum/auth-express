@@ -1,76 +1,73 @@
-const { validationResult } = require("express-validator");
 const { generateJwtToken } = require("../utils");
 const { getHashedPassword } = require("../utils");
-const { isUserExist } = require("../utils");
 const { comparePassword } = require("../utils");
+const User = require("../model/user.model");
 
-const Users = require("../model/user.model");
+const getAllUsers = async (req, res) => {
+  const users = await User.find({});
 
-const getAllUsers = (req, res) => {
-  return res.status(200).json({ users: Users.users });
+  return res.status(200).json({ message: "Users fetched successfully", users });
 };
 
 const registerUser = async (req, res) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   const { username, email, password } = req.body;
 
-  if (isUserExist(Users.users, email)) {
+  const user = await User.findOne({ email: email });
+
+  if (user) {
     return res
       .status(400)
-      .json({ message: "User with this email already exist!" });
+      .json({ message: "User with this email already exists!" });
   }
 
   const hashedPassword = await getHashedPassword(password);
 
-  Users.users.push({ username, email, password: hashedPassword });
+  try {
+    const newUser = new User({ email, password: hashedPassword, username });
+    const savedUser = await newUser.save();
 
-  return res.status(201).json({
-    message: "User registered successfully!",
-  });
+    savedUser.password = undefined;
+
+    return res.status(201).json({
+      message: "User registered successfully!",
+      user: savedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error || "There is some server error" });
+  }
 };
 
 const signIn = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+  const { email, password } = req.body;
 
-  const user = isUserExist(Users.users, req.body.email);
+  const user = await User.findOneAndUpdate(
+    { email },
+    { jwtToken: generateJwtToken(email) },
+    { new: true }
+  ).select("+password");
 
   if (!user) {
     return res.status(400).json({ message: "User with this email not exist!" });
   }
 
-  const isPasswordMatched = await comparePassword(
-    req.body.password,
-    user.password
-  );
+  const isPasswordMatched = await comparePassword(password, user.password);
 
   if (!isPasswordMatched) {
     return res.status(400).json({ message: "Please provide a valid password" });
   }
 
+  user.password = undefined;
+
   return res.status(200).json({
     message: "Signin successfully",
-    token: generateJwtToken(req.body.email),
+    user,
   });
 };
 
 const updatePassword = async (req, res) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   const { email, oldPassword, newPassword } = req.body;
 
-  const user = isUserExist(Users.users, email);
+  const user = await User.findOne({ email: email }).select("+password");
 
   if (!user) {
     return res
@@ -86,13 +83,24 @@ const updatePassword = async (req, res) => {
 
   const hashedPassword = await getHashedPassword(newPassword);
 
-  user.password = hashedPassword;
+  try {
+    user.password = hashedPassword;
 
-  return res.status(200).json({ message: "Password is updated successfully!" });
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Password is updated successfully!" });
+  } catch (error) {
+    res.status(500).json({ message: error || "There is some server error" });
+  }
 };
 
-const logOut = (req, res) => {
-  return res.status(200).json({ message: "Logout successfully", token: null });
+const logOut = async (req, res) => {
+  const { email } = req.user;
+  await User.findOneAndUpdate({ email }, { jwtToken: null });
+
+  return res.status(200).json({ message: "User logout successfully" });
 };
 
 module.exports = {
