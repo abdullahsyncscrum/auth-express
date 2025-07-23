@@ -2,6 +2,13 @@ const { generateJwtToken } = require("../utils");
 const { getHashedPassword } = require("../utils");
 const { comparePassword } = require("../utils");
 const User = require("../model/user.model");
+const MongoDbService = require("../services/mongodb.service");
+const DabaseService = require("../services/database.service");
+const UserRepository = require("../repositories/user.repository");
+
+const dbSchema = new MongoDbService(User);
+const databaseService = new DabaseService(dbSchema);
+const userRepository = new UserRepository(databaseService);
 
 const getAllUsers = async (req, res) => {
   const users = await User.find({});
@@ -12,7 +19,7 @@ const getAllUsers = async (req, res) => {
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
-  const user = await User.findOne({ email: email });
+  const user = await userRepository.findOneWithOutPassword(email);
 
   if (user) {
     return res
@@ -22,29 +29,35 @@ const registerUser = async (req, res) => {
 
   const hashedPassword = await getHashedPassword(password);
 
-  try {
-    const newUser = new User({ email, password: hashedPassword, username });
-    const savedUser = await newUser.save();
+  const newUser = await userRepository.createUser(email, password, username);
 
-    savedUser.password = undefined;
+  // try {
+  //   const newUser = new User({ email, password: hashedPassword, username });
+  //   const savedUser = await newUser.save();
 
-    return res.status(201).json({
-      message: "User registered successfully!",
-      user: savedUser,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error || "There is some server error" });
-  }
+  //   savedUser.password = undefined;
+
+  //   return res.status(201).json({
+  //     message: "User registered successfully!",
+  //     user: savedUser,
+  //   });
+  // } catch (error) {
+  //   res.status(500).json({ message: error || "There is some server error" });
+  // }
 };
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOneAndUpdate(
-    { email },
-    { jwtToken: generateJwtToken(email) },
-    { new: true }
-  ).select("+password");
+  // const user = await User.findOneAndUpdate(
+  //   { email },
+  //   { jwtToken: generateJwtToken(email) },
+  //   { new: true }
+  // ).select("+password");
+
+  const user = await userRepository.findAndUpdate(email, {
+    jwtToken: generateJwtToken(email),
+  });
 
   if (!user) {
     return res.status(400).json({ message: "User with this email not exist!" });
@@ -67,7 +80,9 @@ const signIn = async (req, res) => {
 const updatePassword = async (req, res) => {
   const { email, oldPassword, newPassword } = req.body;
 
-  const user = await User.findOne({ email: email }).select("+password");
+  // const user = await User.findOne({ email: email }).select("+password");
+
+  const user = await userRepository.findOneWithPassword(email);
 
   if (!user) {
     return res
@@ -82,10 +97,9 @@ const updatePassword = async (req, res) => {
   }
 
   const hashedPassword = await getHashedPassword(newPassword);
+  user.password = hashedPassword;
 
   try {
-    user.password = hashedPassword;
-
     await user.save();
 
     return res
@@ -98,7 +112,14 @@ const updatePassword = async (req, res) => {
 
 const logOut = async (req, res) => {
   const { email } = req.user;
-  await User.findOneAndUpdate({ email }, { jwtToken: null });
+  // await User.findOneAndUpdate({ email }, { jwtToken: null });
+
+  const user = await userRepository.findAndUpdate(
+    { email },
+    { jwtToken: null }
+  );
+
+  if (!user) return;
 
   return res.status(200).json({ message: "User logout successfully" });
 };
