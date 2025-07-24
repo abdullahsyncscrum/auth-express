@@ -1,12 +1,16 @@
 const mongoose = require("mongoose");
+const db = require("../model/relational-database/index");
 
-const dbConnection = async () => {
+const connectToDB = async () => {
   try {
-    const connection = await mongoose.connect(process.env.MONGO_URI);
+    if (process.env.DB_TYPE === "Postgress") {
+      await db.sequelize.sync();
+    } else {
+      await mongoose.connect(process.env.MONGO_URI);
+    }
   } catch (error) {
-    console.log("DB errro ", error);
     throw new error();
   }
 };
 
-module.exports = dbConnection;
+module.exports = connectToDB;
