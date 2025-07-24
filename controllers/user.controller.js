@@ -16,7 +16,12 @@ const databaseService = new DabaseService(dbSchema);
 const userRepository = new UserRepository(databaseService);
 
 const getAllUsers = async (req, res) => {
-  return res.status(200);
+  const users = await userRepository.findAllUsers();
+
+  return res.status(200).json({
+    message: "User fetched successfully ",
+    users,
+  });
 };
 
 const registerUser = async (req, res, next) => {
@@ -46,7 +51,6 @@ const registerUser = async (req, res, next) => {
       user: newUser,
     });
   } catch (error) {
-    console.log("Error while register ->  ", error);
     next(error);
   }
 };

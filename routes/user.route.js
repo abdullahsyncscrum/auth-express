@@ -14,7 +14,7 @@ const {
   getAllUsers,
 } = require("../controllers/user.controller");
 
-userRouter.get("/all", authentication, getAllUsers);
+userRouter.get("/all", getAllUsers);
 
 userRouter.post(
   "/register",

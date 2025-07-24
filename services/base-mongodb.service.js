@@ -7,6 +7,15 @@ class MongoDbService {
     this.schema = schema;
   }
 
+  async findAllUsers() {
+    try {
+      return await this.schema.find({});
+    } catch (error) {
+      console.log("Errorr shile fetchhh  ", error);
+      throw new AppError(500, "Failed to fetch users");
+    }
+  }
+
   async findOneWithOutPassword(email) {
     try {
       return await this.schema.findOne({ email }).select("-password");

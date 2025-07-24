@@ -9,6 +9,10 @@ class UserRepository {
     return await this.database.findOneWithOutPassword(email);
   }
 
+  async findAllUsers() {
+    return await this.database.findAllUsers();
+  }
+
   async createUser(data) {
     return await this.database.createUser(data);
   }

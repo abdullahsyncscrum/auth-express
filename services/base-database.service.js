@@ -9,6 +9,10 @@ class DabaseService {
     return this.db.findOneWithOutPassword(email);
   }
 
+  async findAllUsers() {
+    return await this.db.findAllUsers();
+  }
+
   async createUser(data) {
     return await this.db.createUser(data);
   }
