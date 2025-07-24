@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const User = require("../model/user.model");
+const db = require("../model/relational-database/index");
 
 const authentication = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -12,7 +13,14 @@ const authentication = async (req, res, next) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const user = await User.findOne({ jwtToken: token });
+  let user;
+  if (process.env.DB_TYPE === "Postgress") {
+    user = await db.User.findOne({
+      where: { jwtToken: token },
+    });
+  } else {
+    user = await User.findOne({ jwtToken: token });
+  }
 
   if (!user) {
     return res.status(400).json({ error: "Incorrect Jwt token" });

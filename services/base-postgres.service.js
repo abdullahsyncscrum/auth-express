@@ -1,6 +1,6 @@
 const AppError = require("../utils/app-error.util");
 
-class MongoDbService {
+class PostgressService {
   model;
 
   constructor(model) {
@@ -9,25 +9,28 @@ class MongoDbService {
 
   async findAllUsers() {
     try {
-      return await this.model.find({});
+      return await this.model.findAll();
     } catch (error) {
-      console.log("Errorr shile fetchhh  ", error);
       throw new AppError(500, "Failed to fetch users");
     }
   }
 
   async findOneWithOutPassword(email) {
     try {
-      return await this.model.findOne({ email }).select("-password");
+      const user = await this.model.findOne({
+        where: { email },
+        attributes: { exclude: ["password"] },
+      });
+      return user;
     } catch (error) {
+      console.log("Error s ", error);
       throw new AppError(500, "Failed to fetch user");
     }
   }
 
   async createUser(data) {
     try {
-      const newUser = new this.model({ ...data });
-      return await newUser.save();
+      return await this.model.create(data);
     } catch (error) {
       throw new AppError(500, "Failed to create user");
     }
@@ -35,9 +38,12 @@ class MongoDbService {
 
   async findByEmailAndUpdate(email, updateInfo) {
     try {
-      return await this.model
-        .findOneAndUpdate({ email }, { ...updateInfo }, { new: true })
-        .select("+password");
+      const [_, [updatedUser]] = await this.model.update(updateInfo, {
+        where: { email },
+        returning: true,
+      });
+
+      return updatedUser;
     } catch (error) {
       throw new AppError(500, "Failed to update user information");
     }
@@ -45,11 +51,14 @@ class MongoDbService {
 
   async findOneWithPassword(email) {
     try {
-      return await this.model.findOne({ email }).select("+password");
+      return await this.model.findOne({
+        where: { email },
+        attributes: { include: ["password"] },
+      });
     } catch (error) {
       throw new AppError(500, "Failed to fetch user");
     }
   }
 }
 
-module.exports = MongoDbService;
+module.exports = PostgressService;

@@ -11,7 +11,7 @@ Content-Type: application/json
 {
   "password": "@J1ohndoe",
   "username": "@J1ohndoe",
-  "email": "gsss.dne@example.com"
+  "email": "mail.dne@example.com"
 }
 
 
@@ -21,24 +21,24 @@ POST http://localhost:8080/api/v1/user/signin
 Content-Type: application/json
 
 {
-  "password": "@J1ohndoe1",
-  "email": "g.dne@example.com"
+  "password": "@J1ohndoe",
+  "email": "gsss.dne@example.com"
 }
 
 
 ### Reset password
 PATCH http://localhost:8080/api/v1/user/update-password
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImcuZG5lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMzM5OTc2LCJleHAiOjE3NTM0MjYzNzZ9.Ryd6kfp8BHpgbG1Wrv6VhwYB7INwe6WnaMq1uWewEKM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imdzc3MuZG5lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMzY0MTU2LCJleHAiOjE3NTM0NTA1NTZ9.4rTuKqN7pz7E5gjWoOYfSEYMiM5f2Q3eK_vSHOSYz-U
 
 {
   "oldPassword": "@J1ohndoe",
   "newPassword": "@J1ohndoe1",
-  "email": "g.dne@example.com"
+  "email": "gsss.dne@example.com"
 }
 
 
 ### Logout
 GET http://localhost:8080/api/v1/user/logout
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImcuZG5lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMzQwMDI3LCJleHAiOjE3NTM0MjY0Mjd9.qmtHqvfYB_pymBdUApb3jcmi2hZdyAinMxtY4qjfxFI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imdzc3MuZG5lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMzY0MTU2LCJleHAiOjE3NTM0NTA1NTZ9.4rTuKqN7pz7E5gjWoOYfSEYMiM5f2Q3eK_vSHOSYz-U

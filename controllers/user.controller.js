@@ -1,18 +1,21 @@
 const { generateJwtToken } = require("../utils");
 const { getHashedPassword } = require("../utils");
 const { comparePassword } = require("../utils");
-const User = require("../model/user.model");
-const MongoDbService = require("../services/base-mongodb.service");
-const DabaseService = require("../services/base-database.service");
+const DatabaseService = require("../services/base-database.service");
 const UserRepository = require("../repositories/user.repository");
 
 let dbSchema = null;
-if (process.env.DB_TYPE === "SQL") {
-  dbSchema = null;
+if (process.env.DB_TYPE === "Postgress") {
+  const db = require("../model/relational-database/index");
+  const PostgressService = require("../services/base-postgres.service");
+  dbSchema = new PostgressService(db.User);
 } else {
+  const User = require("../model/user.model");
+  const MongoDbService = require("../services/base-mongodb.service");
   dbSchema = new MongoDbService(User);
 }
-const databaseService = new DabaseService(dbSchema);
+
+const databaseService = new DatabaseService(dbSchema);
 const userRepository = new UserRepository(databaseService);
 
 const getAllUsers = async (req, res) => {
