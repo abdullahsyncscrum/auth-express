@@ -14,7 +14,7 @@ const authentication = async (req, res, next) => {
   }
 
   let user;
-  if (process.env.DB_TYPE === "Postgress") {
+  if (process.env.DB_TYPE === "Postgres") {
     user = await db.User.findOne({
       where: { jwtToken: token },
     });

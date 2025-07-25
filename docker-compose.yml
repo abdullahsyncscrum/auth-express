@@ -4,10 +4,13 @@ services:
   app:
     build: .
     ports:
-      - "8080:8080"
+      - "${PORT}:${PORT}"
+    env_file: .env
     environment:
-      - MONGO_URI=mongodb://mongo:27017/auth
-      - PG_URI=PG_URI=postgresql://postgres:postgres@postgres:5432/auth
+      - PORT
+      - MONGO_URI
+      - PG_URI
+      - DB_TYPE
     depends_on:
       - mongo
       - postgres
@@ -27,7 +30,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: auth
     ports:
       - "5433:5432"
     volumes:

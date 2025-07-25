@@ -6,7 +6,9 @@ const app = express();
 
 const userRouter = require("./routes/user.route");
 
-const PORT = process.env.PORT || 5000;
+console.log("And env enviiror ", process.env);
+
+const PORT = process.env.PORT || 8080;
 app.use(express.json());
 
 // User routes

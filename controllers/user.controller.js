@@ -5,7 +5,7 @@ const DatabaseService = require("../services/base-database.service");
 const UserRepository = require("../repositories/user.repository");
 
 let dbSchema = null;
-if (process.env.DB_TYPE === "Postgress") {
+if (process.env.DB_TYPE === "Postgres") {
   const db = require("../model/relational-database/index");
   const PostgressService = require("../services/base-postgres.service");
   dbSchema = new PostgressService(db.User);
