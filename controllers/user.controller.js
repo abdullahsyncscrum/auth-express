@@ -62,9 +62,7 @@ const signIn = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    const user = await userRepository.findByEmailAndUpdate(email, {
-      jwtToken: generateJwtToken(email),
-    });
+    const user = await userRepository.findOneWithPassword(email);
 
     if (!user) {
       return res.status(400).json({ error: "User with this email not exist!" });
@@ -76,7 +74,13 @@ const signIn = async (req, res, next) => {
       return res.status(400).json({ error: "Please provide a valid password" });
     }
 
+    const token = generateJwtToken(email);
+
+    user.jwtToken = token;
+
     user.password = undefined;
+
+    await user.save();
 
     return res.status(200).json({
       message: "Signin successfully",
